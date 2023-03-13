@@ -1,0 +1,37 @@
+version: '3.3'
+
+volumes:
+  redis_vol:
+
+networks:
+  redis_net:
+    driver: bridge
+
+services:
+  redisdb:
+    image: redis:latest
+    container_name: redisdb 
+    volumes:
+      - redis_vol:/data
+    networks:
+      - redis_net
+    ports:
+      - 6379:6379
+    environment:
+      REDIS_PASSWORD: redispass 
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    hostname: local:redisdb:6379
+    restart: always
+    environment:
+      REDIS_HOST: redisdb 
+      HTTP_USER: userredis
+      HTTP_PASSWORD: passredis
+    ports:
+      - 8081:8081
+    networks:
+      - redis_net 
+    depends_on:
+      - redisdb 
